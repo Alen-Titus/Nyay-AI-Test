@@ -10,7 +10,8 @@
                 <h3>
 					<small>Home /</small> Borrow Book
                 </h3>
-            </div>
+php
+</div>
         </div>
         <div class="clearfix"></div>
 
@@ -20,8 +21,10 @@
                     <div class="x_title">
 					
 					<?php
-						$sql = mysqli_query($con,"SELECT * FROM user WHERE roll_number = '$roll_number' ");
-						$row = mysqli_fetch_array($sql);
+						$stmt = $con->prepare("SELECT * FROM user WHERE roll_number = ?");
+						$stmt->bind_param("s", $roll_number);
+						$stmt->execute();
+						$row = $stmt->get_result()->fetch_assoc();
 					?>
 					<h2>
 					Borrower Name : <span style="color:maroon;"><?php echo $row['firstname']." ".$row['middlename']." ".$row['lastname']; ?></span>
@@ -33,10 +36,8 @@
                         <!-- content starts here -->
 						
 						<div class="table-responsive">
-							<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="example">
-								
-							<thead>
-								<tr>
+php
+<tr>
 									<th>Barcode</th>
 									<th>Title</th>
 									<th>Author</th>
@@ -46,14 +47,17 @@
 									<th>Penalty</th>
 									<th>Action</th>
 							<?php 
-								$borrow_query = mysqli_query($con,"SELECT * FROM borrow_book
+								$borrow_query = mysqli_query($con, "SELECT * FROM borrow_book
 									LEFT JOIN book ON borrow_book.book_id = book.book_id
-									WHERE user_id = '".$user_row['user_id']."' && borrowed_status = 'borrowed' ORDER BY borrow_book_id DESC") or die(mysqli_error($con));
+									WHERE user_id = ? && borrowed_status = 'borrowed' ORDER BY borrow_book_id DESC", array($user_row['user_id'])) or die(mysqli_error($con));
 								$borrow_count = mysqli_num_rows($borrow_query);
-								while($borrow_row = mysqli_fetch_array($borrow_query)){
-									$due_date= $borrow_row['due_date'];
+								while ($borrow_row = mysqli_fetch_array($borrow_query)) {
+									$due_date = $borrow_row['due_date'];
 								
 								$timezone = "Asia/Manila";
+								if (function_exists('date_default_timezone_set')) date_default_timezone_set($timezone);
+								$cur_date = date("Y-m-d H:i:s");
+								$date_returned = date("Y-m-d H:i:s");
 								if(function_exists('date_default_timezone_set')) date_default_timezone_set($timezone);
 								$cur_date = date("Y-m-d H:i:s");
 								$date_returned = date("Y-m-d H:i:s");
@@ -113,31 +117,29 @@
 									</table>
 								';
 							} 							
-							?>
-							<?php
-								if (isset($_POST['return'])) {
-									$user_id= $_POST['user_id'];
-									$borrow_book_id= $_POST['borrow_book_id'];
-									$book_id= $_POST['book_id'];
-									$date_borrowed= $_POST['date_borrowed'];
-									$due_date= $_POST['due_date'];
-									$date_returned_now = $_POST['date_returned'];
+php
+$borrow_book_id = $_POST['borrow_book_id'];
+php
+$date_borrowed = $_POST['date_borrowed'];
+$due_date = $_POST['due_date'];
+$date_returned_now = $_POST['date_returned'];
 
-									
-									mysqli_query($con,"UPDATE book SET remarks = 'Available' where book_id = '$book_id' ") or die (mysqli_error($con));
-								
-									
-									mysqli_query ($con,"UPDATE borrow_book SET borrowed_status = 'returned', date_returned = '$date_returned_now', book_penalty = '$penalty' WHERE borrow_book_id= '$borrow_book_id' and user_id = '$user_id' and book_id = '$book_id' ") or die (mysqli_error($con));
-									
-									mysqli_query ($con,"INSERT INTO return_book (user_id, book_id, date_borrowed, due_date, date_returned, book_penalty)
-									values ('$user_id', '$book_id', '$date_borrowed', '$due_date', '$date_returned', '$penalty')") or die (mysqli_error($con));
-									
-									$report_history1=mysqli_query($con,"select * from admin where admin_id = $id_session ") or die (mysqli_error($con));
-									$report_history_row1=mysqli_fetch_array($report_history1);
-									$admin_row1=$report_history_row1['firstname']." ".$report_history_row1['middlename']." ".$report_history_row1['lastname'];	
-									
-									mysqli_query($con,"INSERT INTO report 
-									(book_id, user_id, admin_name, detail_action, date_transaction)
+mysqli_query($con, "UPDATE book SET remarks = 'Available' WHERE book_id = '$book_id' ") or die(mysqli_error($con));
+
+mysqli_query($con, "UPDATE borrow_book SET borrowed_status = 'returned', date_returned = ?, book_penalty = ? 
+                    WHERE borrow_book_id= ?, user_id = ?, book_id = ?
+                    LIMIT 1", array($date_returned_now, $penalty, $borrow_book_id, $user_id, $book_id)) or die(mysqli_error($con));
+
+mysqli_query($con, "INSERT INTO return_book (user_id, book_id, date_borrowed, due_date, date_returned, book_penalty)
+                    VALUES (?, ?, ?, ?, ?, ?)", array($user_id, $book_id, $date_borrowed, $due_date, $date_returned_now, $penalty)) or die(mysqli_error($con));
+
+$report_history1 = mysqli_query($con, "SELECT * FROM admin WHERE admin_id = ?", array($id_session)) or die(mysqli_error($con));
+$report_history_row1 = mysqli_fetch_array($report_history1);
+$admin_row1 = $report_history_row1['firstname'] . ' ' . $report_history_row1['middlename'] . ' ' . $report_history_row1['lastname'];
+
+mysqli_query($con, "INSERT INTO report 
+                    (book_id, user_id, admin_name, detail_action, date_transaction)
+                    VALUES (?, ?, ?, 'Returned Book', NOW())", array($book_id, $user_id, $admin_row1)) or die(mysqli_error($con));
 									VALUES ('$book_id','$user_id','$admin_row1','Returned Book',NOW())") or die(mysqli_error($con));
 									
 							?>
