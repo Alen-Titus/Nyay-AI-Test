@@ -93,8 +93,8 @@ function printPage() {
 								<td></td>
 								<td></td>
 							</tr>
-							
-							<?php 
+php
+<?php 
 							}					
 							?>
 						  </tbody> 
@@ -103,17 +103,16 @@ function printPage() {
 <br />
 <br />
 							<?php
-								$user_query=mysqli_query($con,"select * from admin where admin_id='$id_session'")or die(mysql_error());
-								$row=mysqli_fetch_array($user_query); {
+								$stmt = $con->prepare("SELECT * FROM admin WHERE admin_id=?");
+								$stmt->bind_param("i", $id_session);
+								$stmt->execute();
+								$result = $stmt->get_result();
+								$row = $result->fetch_array(MYSQLI_ASSOC);
+
+							if ($row) {
 							?>        <h2><i class="glyphicon glyphicon-user"></i> <?php echo '<span style="color:blue; font-size:15px;">Prepared by:'."<br /><br /> ".$row['firstname']." ".$row['lastname']." ".'</span>';?></h2>
 								<?php } ?>
-
-
 			</div>
-	
-	
-	
-	
 
 	</div>
 </body>
