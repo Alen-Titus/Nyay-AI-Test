@@ -13,17 +13,18 @@ $ID=$_GET['admin_id'];
         <div class="clearfix"></div>
  
         <div class="row">
-            <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2><i class="fa fa-pencil"></i> Edit Librarian</h2>
-                
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
-                        <!-- content starts here -->
+php
+<div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2><i class="fa fa-pencil"></i> Edit Librarian</h2>
+        
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <!-- content starts here -->
 <?php
-  $query=mysqli_query($con,"select * from admin where admin_id='$ID'")or die(mysqli_error($con));
+  $query=mysqli_query($con,"SELECT * FROM admin WHERE admin_id = '$ID'")or die(mysqli_error($con));
 $row=mysqli_fetch_array($query);
   ?>
 
@@ -33,7 +34,7 @@ $row=mysqli_fetch_array($query);
                                     </label>
                                     <div class="col-md-4">
 										<a href=""><?php if($row['admin_image'] != ""): ?>
-										<img src="upload/<?php echo $row['admin_image']; ?>" width="100px" height="100px" style="border:4px groove #CCCCCC; border-radius:5px;">
+										<img src="upload/<?php echo htmlspecialchars($row['admin_image']); ?>" width="100px" height="100px" style="border:4px groove #CCCCCC; border-radius:5px;">
 										<?php else: ?>
 										<img src="images/user.png" width="100px" height="100px" style="border:4px groove #CCCCCC; border-radius:5px;">
 										<?php endif; ?>
@@ -138,49 +139,60 @@ $email_id = $_POST['email_id'];
 $contact = $_POST['contact'];
 $password = $_POST['password'];
 $confirm_password = $_POST['confirm_password'];
-// $admin_type = $_POST['admin_type'];
+php
 $still_profile = $row['admin_image'];
 
-$result=mysqli_query($con,"select * from admin") or die (mysqli_error($con));
+$result=mysqli_query($con,"SELECT * FROM admin") or die (mysqli_error($con));
 $row=mysqli_num_rows($result);
 
 if($password != $confirm_password)
 {
-echo "<script>alert('Password do not match!'); window.location='admin.php'</script>";
+    echo "<script>alert('Password do not match!'); window.location='admin.php'</script>";
 }else
 {
-mysqli_query($con," UPDATE admin SET firstname='$firstname', middlename='$middlename', lastname='$lastname',adhaar_id='$adhaar_id',email_id='$email_id',contact='$contact' , password='$password', 
-confirm_password='$confirm_password', admin_image='$still_profile' WHERE admin_id = '$id' ")or die(mysqli_error($con));
-echo "<script>alert('Successfully Update Admin Info!'); window.location='admin.php'</script>";	
+    $updateQuery = "UPDATE admin SET 
+        firstname='$firstname', 
+        middlename='$middlename', 
+        lastname='$lastname', 
+        adhaar_id='$adhaar_id', 
+        email_id='$email_id', 
+        contact='$contact' , 
+        password=SHA2('$password', 256), 
+        confirm_password=SHA2('$confirm_password', 256), 
+        admin_image='$still_profile' 
+    WHERE admin_id = '$id'";
+    
+    mysqli_query($con, $updateQuery) or die(mysqli_error($con));
+    echo "<script>alert('Successfully Update Admin Info!'); window.location='admin.php'</script>";	
 }
-									}else{
-										if($size > 10000000) //conditions for the file
-										{
-										die("Format is not allowed or file size is too big!");
-										}
-										
+}else{
+    if($size > 10000000) //conditions for the file
+    {
+        die("Format is not allowed or file size is too big!");
+    }
+}
 
-move_uploaded_file($_FILES["image"]["tmp_name"],"upload/" . $_FILES["image"]["name"]);			
-$profile=$_FILES["image"]["name"];
+php
+$result = mysqli_query($con, "SELECT * FROM admin") or die(mysqli_error($con));
+$row = mysqli_num_rows($result);
 
-$firstname = $_POST['firstname'];
-$middlename = $_POST['middlename'];
-$lastname = $_POST['lastname'];
-$adhaar_id = $_POST['adhaar_id'];
-$email_id = $_POST['email_id'];
-$contact = $_POST['contact'];
-$password = $_POST['password'];
-$confirm_password = $_POST['confirm_password'];
-// $admin_type = $_POST['admin_type'];
-
-$result=mysqli_query($con,"select * from admin") or die (mysqli_error($con));
-$row=mysqli_num_rows($result);
-
-if($password != $confirm_password)
-{
-echo "<script>alert('Password do not match!'); window.location='admin.php'</script>";
-}else
-
+if ($password != $confirm_password) {
+    echo "<script>alert('Password do not match!'); window.location='admin.php'</script>";
+} else {
+    $updateQuery = "
+        UPDATE admin 
+        SET firstname = '$firstname', middlename = '$middlename', lastname = '$lastname', adhaar_id = '$adhaar_id', email_id = '$email_id', contact = '$contact', password = '$password', 
+        confirm_password = '$confirm_password', admin_image = '$profile' 
+        WHERE admin_id = '$id'
+    ";
+    $resultUpdate = mysqli_query($con, $updateQuery) or die(mysqli_error($con));
+    if ($resultUpdate) {
+        echo "<script>alert('Successfully Updated Admin Info!'); window.location='admin.php'</script>";
+    } else {
+        echo "<script>alert('Error updating admin info!'); window.location='admin.php'</script>";
+    }
+}
+?>
 {		
 mysqli_query($con," UPDATE admin SET firstname='$firstname', middlename='$middlename', lastname='$lastname', adhaar_id='$adhaar_id',email_id='$email_id',contact='$contact',password='$password', 
 confirm_password='$confirm_password', admin_image='$profile' WHERE admin_id = '$id' ")or die(mysqli_error($con));
