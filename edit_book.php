@@ -12,19 +12,20 @@ $ID=$_GET['book_id'];
         </div>
         <div class="clearfix"></div>
  
-        <div class="row">
-            <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2><i class="fa fa-pencil"></i> Edit Book</h2>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
-                        <!-- content starts here -->
+php
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2><i class="fa fa-pencil"></i> Edit Book</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <!-- content starts here -->
 <?php
-  $query=mysqli_query($con,"select * from book where book_id='$ID'")or die(mysql_error());
-$row=mysqli_fetch_array($query);
-  ?>
+  $query = mysqli_query($con, "SELECT * FROM book WHERE book_id = '$ID'") or die(mysqli_error($con));
+  $row = mysqli_fetch_array($query);
+?>
 
                             <form method="post" enctype="multipart/form-data" class="form-horizontal form-label-left">
                                 <div class="form-group">
@@ -171,27 +172,46 @@ if (isset($_POST['update11'])) {
 					$publisher_name=$_POST['publisher_name'];
 					$isbn=$_POST['isbn'];
 					$copyright_year=$_POST['copyright_year'];
-					$status=$_POST['status'];
+php
 $still_profile1 = $row['book_image'];
 
+if ($status == 'Lost') {
+    $remark = 'Not Available';
+} else {
+    $remark = 'Available';
+}
 
-					if ($status == 'Lost') {
-						$remark = 'Not Available';
-					} else {
-						$remark = 'Available';
-					}
+$stmt = mysqli_prepare($con, "UPDATE book SET 
+    book_title=?,
+    category=?,
+    author=?,
+    author_2=?,
+    author_3=?,
+    author_4=?,
+    author_5=?,
+    book_pub=?,
+    publisher_name=?,
+    isbn=?,
+    copyright_year=?,
+    status=?,
+    book_image=?,
+    remarks=?
+WHERE book_id = ?");
 
+mysqli_stmt_bind_param($stmt, "sssssssssssss", 
+    $book_title, $category, $author, $author_2, $author_3, $author_4, $author_5, 
+    $book_pub, $publisher_name, $isbn, $copyright_year, $status, $still_profile1, $remark);
 
-mysqli_query($con," UPDATE book SET book_title='$book_title', category='$category', author='$author', author_2='$author_2', author_3='$author_3', author_4='$author_4', author_5='$author_5', 
-book_pub='$book_pub', publisher_name='$publisher_name', isbn='$isbn', copyright_year='$copyright_year', status='$status', book_image='$still_profile1', remarks='$remark' WHERE book_id = '$id' ")or die(mysqli_error($con));
-echo "<script>alert('Successfully Updated Book Info!'); window.location='book.php'</script>";	
+mysqli_stmt_execute($stmt) or die(mysqli_error($con));
 
-									}else{
-										if($size > 10000000) //conditions for the file
-										{
-										die("Format is not allowed or file size is too big!");
-										}
-										
+echo "<script>alert('Successfully Updated Book Info!'); window.location='book.php'</script>";
+
+}else{
+    if($size > 10000000) //conditions for the file
+    {
+        die("Format is not allowed or file size is too big!");
+    }
+}
 
 move_uploaded_file($_FILES["image"]["tmp_name"],"upload/" . $_FILES["image"]["name"]);			
 $profile=$_FILES["image"]["name"];
@@ -205,27 +225,42 @@ $profile=$_FILES["image"]["name"];
 					$author_5=$_POST['author_5'];
 					$book_pub=$_POST['book_pub'];
 					$publisher_name=$_POST['publisher_name'];
-					$isbn=$_POST['isbn'];
-					$copyright_year=$_POST['copyright_year'];
-					$status=$_POST['status'];
+php
+$copyright_year = $_POST['copyright_year'];
+$status = $_POST['status'];
 
+if ($status == 'Lost') {
+    $remark = 'Not Available';
+} else {
+    $remark = 'Available';
+}
 
-					if ($status == 'Lost') {
-						$remark = 'Not Available';
-					} else {
-						$remark = 'Available';
-					}
-					
-mysqli_query($con," UPDATE book SET book_title='$book_title', category='$category', author='$author', author_2='$author_2', author_3='$author_3', author_4='$author_4', author_5='$author_5',
-book_pub='$book_pub', publisher_name='$publisher_name', isbn='$isbn', copyright_year='$copyright_year', status='$status', book_image='$profile', remarks='$remark' WHERE book_id = '$id' ")or die(mysqli_error($con));
-echo "<script>alert('Successfully Updated Book Info!'); window.location='book.php'</script>";	
-
+$stmt = mysqli_prepare($con, "UPDATE book SET 
+book_title=?,
+category=?,
+author=?,
+author_2=?,
+author_3=?,
+author_4=?,
+author_5=?,
+book_pub=?,
+publisher_name=?,
+isbn=?,
+copyright_year=?,
+status=?,
+book_image=?,
+remarks=?
+WHERE book_id = ?");
+mysqli_stmt_bind_param($stmt, "sssssssssssss", $book_title, $category, $author, $author_2, $author_3, $author_4, $author_5, $book_pub, $publisher_name, $isbn, $copyright_year, $status, $profile, $remark, $id);
+mysqli_stmt_execute($stmt) or die(mysqli_error($con));
+echo "<script>alert('Successfully Updated Book Info!'); window.location='book.php'</script>";
 }
 }
 ?>
-						
+                        
                         <!-- content ends here -->
                     </div>
+                </div>
                 </div>
             </div>
         </div>

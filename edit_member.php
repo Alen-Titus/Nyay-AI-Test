@@ -17,7 +17,8 @@ $ID=$_GET['user_id'];
                 <div class="x_panel">
                     <div class="x_title">
                         <h2><i class="fa fa-pencil"></i> Edit Member Information</h2>
-                        <ul class="nav navbar-right panel_toolbox">
+php
+<ul class="nav navbar-right panel_toolbox">
                             <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
                        
                             <li><a class="close-link"><i class="fa fa-close"></i></a></li>
@@ -27,7 +28,7 @@ $ID=$_GET['user_id'];
                     <div class="x_content">
                         <!-- content starts here -->
 <?php
-  $query=mysqli_query($con,"select * from user where user_id='$ID'")or die(mysqli_error($con));
+  $query=mysqli_query($con,"SELECT * FROM user WHERE user_id = '$ID'")or die(mysqli_error($con));
 $row=mysqli_fetch_array($query);
   ?>
 
@@ -136,27 +137,28 @@ $firstname = $_POST['firstname'];
 $middlename = $_POST['middlename'];
 $lastname = $_POST['lastname'];
 $contact = $_POST['contact'];
-$gender = $_POST['gender'];
+php
 $address = $_POST['address'];
 $type = $_POST['type'];
 $branch = $_POST['branch'];
 
- $regex_num = "/^[6789][0-9]{9}$/";
- if (!preg_match($regex_num, $contact)) {
-                        echo "<script>alert('Not a valid contact number'); window.location='member.php'</script>";
-}
-else
-{		
-mysqli_query($con," UPDATE user SET roll_number='$roll_number', firstname='$firstname', middlename='$middlename', lastname='$lastname', contact='$contact', 
-gender='$gender', address='$address', type='$type', branch='$branch' WHERE user_id = '$id' ")or die(mysqli_error($con));
-echo "<script>alert('Successfully Updated User Info!'); window.location='member.php'</script>";
+$regex_num = "/^[6789][0-9]{9}$/";
+if (!preg_match($regex_num, $contact)) {
+    echo "<script>alert('Not a valid contact number'); window.location='member.php'</script>";
+} else {
+    $stmt = mysqli_prepare($con, "UPDATE user SET roll_number=?, firstname=?, middlename=?, lastname=?, contact=?, gender=?, address=?, type=?, branch=? WHERE user_id = ?");
+    mysqli_stmt_bind_param($stmt, 'sssssssss', $roll_number, $firstname, $middlename, $lastname, $contact, $gender, $address, $type, $branch, $id);
+    if (mysqli_stmt_execute($stmt)) {
+        echo "<script>alert('Successfully Updated User Info!'); window.location='member.php'</script>";
+    } else {
+        echo "<script>alert('Error updating user info: " . mysqli_error($con) . "');</script>";
+    }
 }
 
-}
 ?>
-						
-                        <!-- content ends here -->
-                    </div>
+<!-- content ends here -->
+</div>
+</div>
                 </div>
             </div>
         </div>
