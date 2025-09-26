@@ -123,38 +123,70 @@
 									move_uploaded_file($_FILES["image"]["tmp_name"],"upload/" . $_FILES["image"]["name"]);			
 									$profile=$_FILES["image"]["name"];
 									$firstname = $_POST['firstname'];
-									$middlename = $_POST['middlename'];
-									$lastname = $_POST['lastname'];
-                                    $adhaar_id = $_POST['adhaar_id'];
-                                    $email_id = $_POST['email_id'];
-                                    $contact = $_POST['contact'];
-									$username = $_POST['username'];
-									$password = $_POST['password'];
-									$confirm_password = $_POST['confirm_password'];
-									
-					
-					$result=mysqli_query($con,"select * from admin WHERE username='$username' ") or die (mysqli_error($con));
-					$row=mysqli_num_rows($result);
-					if ($row > 0)
-					{
-					echo "<script>alert('Username already taken!'); window.location='add_librarian.php'</script>";
-					}
-					elseif($password != $confirm_password)
-					{
-					echo "<script>alert('Password do not match!'); window.location='add_librarian.php'</script>";
-					}else
-					{		
-						mysqli_query($con,"insert into admin (firstname, middlename, lastname,adhaar_id,email_id,contact , username, password, confirm_password, admin_image, admin_added)
-						values ('$firstname', '$middlename', '$lastname','$adhaar_id','$email_id','$contact', '$username', '$password', '$confirm_password', '$profile',NOW())")or die(mysqli_error($con));
-						echo "<script>alert('Account successfully added!'); window.location='admin.php'</script>";
-					}
-									}
-									}
-							}
-								?>
-						
-                        <!-- content ends here -->
-                    </div>
+php
+$middlename = $_POST['middlename'];
+$lastname = $_POST['lastname'];
+$adhaar_id = $_POST['adhaar_id'];
+$email_id = $_POST['email_id'];
+$contact = $_POST['contact'];
+$username = $_POST['username'];
+$password = $_POST['password'];
+$confirm_password = $_POST['confirm_password'];
+
+$result = mysqli_query($con, "SELECT * FROM admin WHERE username = '$username'") or die(mysqli_error($con));
+$row = mysqli_num_rows($result);
+
+if ($row > 0) {
+    echo "<script>alert('Username already taken!'); window.location='add_librarian.php'</script>";
+} elseif (password_verify($confirm_password, $confirm_password)) { // Changed to password_verify
+    if ($password != $confirm_password) {
+        echo "<script>alert('Password do not match!'); window.location='add_librarian.php'</script>";
+    } else {
+    if (!$stmt) {
+        die(mysqli_error($con));
+    }
+    mysqli_stmt_bind_param($stmt, "sssssssss", $firstname, $middlename, $lastname, $adhaar_id, $email_id, $contact, $username, $password, $confirm_password, $profile);
+    if (!mysqli_stmt_execute($stmt)) {
+        die(mysqli_error($con));
+    }
+    mysqli_stmt_close($stmt);
+    echo "<script>alert('Account successfully added!'); window.location='admin.php'</script>";
+}
+?>
+    
+    // Check if the username already exists
+    $sql = "SELECT * FROM admin WHERE username=?";
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $username);
+    mysqli_stmt_execute($stmt);
+    
+    // Check if the result is greater than 0
+    $resultCheck = mysqli_num_rows($stmt);
+    if ($resultCheck > 0) {
+        echo "<script>alert('Username already taken!'); window.location='add_librarian.php'</script>";
+    } else {
+        // Check if passwords match
+        if ($password != $confirm_password) {
+            echo "<script>alert('Password do not match!'); window.location='add_librarian.php'</script>";
+        } else {
+            // Prepare and bind the parameters for the INSERT statement
+            $sql = "INSERT INTO admin (firstname, middlename, lastname, adhaar_id, email_id, contact, username, password, confirm_password, admin_image, admin_added) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+            $stmt = mysqli_prepare($con, $sql);
+            mysqli_stmt_bind_param($stmt, "ssssisssss", $firstname, $middlename, $lastname, $adhaar_id, $email_id, $contact, $username, $password, $confirm_password, $profile);
+            
+            // Execute the INSERT statement
+            mysqli_stmt_execute($stmt);
+            
+            // Check if the insert was successful
+            if (mysqli_stmt_affected_rows($stmt) == 1) {
+                echo "<script>alert('Account successfully added!'); window.location='admin.php'</script>";
+            } else {
+                echo "Error: " . mysqli_error($con);
+            }
+        }
+    }
+}
+?>
                 </div>
             </div>
         </div>

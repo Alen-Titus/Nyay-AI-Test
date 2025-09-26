@@ -26,7 +26,8 @@
 													<a class="btn btn-primary" for="ViewAdmin" href="#days_edit<?php echo $allowed_days_id; ?>" data-toggle="modal" data-target="#days_edit<?php echo $allowed_days_id;?>">
 														<i class="fa fa-edit"></i> Edit
 													</a>
-												</td>
+php
+</td>
 									<!-- edit modal -->
 									<div class="modal fade" id="days_edit<?php  echo $allowed_days_id;?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 									<div class="modal-dialog">
@@ -36,7 +37,7 @@
 										</div>
 										<div class="modal-body">
 												<?php
-												$query2=mysqli_query($con,"select * from allowed_days where allowed_days_id='$allowed_days_id'")or die(mysql_error());
+												$query2=mysqli_query($con,"SELECT * FROM allowed_days WHERE allowed_days_id = '$allowed_days_id'")or die(mysqli_error($con));
 												$row44=mysqli_fetch_array($query2);
 												?>
 												<form method="post" enctype="multipart/form-data" class="form-horizontal">

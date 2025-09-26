@@ -116,27 +116,32 @@
 									$firstname = $_POST['firstname'];
 									$middlename = $_POST['middlename'];
 									$lastname = $_POST['lastname'];
-									$contact = $_POST['contact'];
-									$gender = $_POST['gender'];
-                                    $type = $_POST['type'];
-                                    $branch = $_POST['branch'];
-									$address = $_POST['address'];
-								
-                        $regex_num = "/^[6789][0-9]{9}$/";
-									
-								
-					
-					$result=mysqli_query($con,"select * from user WHERE roll_number='$roll_number' OR contact='$contact'") or die (mysqli_error($con));
-					$row=mysqli_num_rows($result);
-					if ($row > 0)
-					{
-					echo "<script>alert('Roll Number OR Contact <br> already exist!'); window.location='member.php'</script>";
-					}else if (!preg_match($regex_num, $contact)) {
-                        echo "<script>alert('Not a valid contact number'); window.location='member.php'</script>";
-					}else
-					{		
-						mysqli_query($con,"insert into user (roll_number,firstname, middlename, lastname, contact, gender, address, type, branch, user_added)
-						values ('$roll_number','$firstname', '$middlename', '$lastname', '$contact', '$gender', '$address', '$type', '$branch', NOW())")or die(mysqli_error($con));
+php
+$contact = $_POST['contact'];
+$gender = $_POST['gender'];
+$type = $_POST['type'];
+$branch = $_POST['branch'];
+$address = $_POST['address'];
+
+$regex_num = "/^[6789][0-9]{9}$/";
+
+php
+$result = mysqli_query($con, "SELECT * FROM user WHERE roll_number = ? OR contact = ?", array($roll_number, $contact)) or die(mysqli_error($con));
+$row = mysqli_num_rows($result);
+if ($row > 0) {
+    echo "<script>alert('Roll Number OR Contact <br> already exist!'); window.location='member.php'</script>";
+} elseif (!preg_match($regex_num, $contact)) {
+    echo "<script>alert('Not a valid contact number'); window.location='member.php'</script>";
+} else {
+    mysqli_query($con, "INSERT INTO user (roll_number, firstname, middlename, lastname, contact, gender, address, type, branch, user_added) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())", array($roll_number, $firstname, $middlename, $lastname, $contact, $gender, $address, $type, $branch)) or die(mysqli_error($con));
+    echo "<script>alert('User successfully added!'); window.location='member.php'</script>";
+}
+?>
+<!-- content ends here -->
+</div>
+</div>
+</div>
+}
 						echo "<script>alert('User successfully added!'); window.location='member.php'</script>";
 					}
 							}
