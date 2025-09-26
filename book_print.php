@@ -58,7 +58,8 @@ function printPage() {
 				<center><h5 style = "font-style:Calibri; margin-top:-14px;"></h5> &nbsp; &nbsp;Demo Institute Of Pharmacy - 551</center>
 				<center><h5 style = "font-style:Calibri; margin-top:-14px;"></h5>  Library Management System</center>
 					
-				</div><hr style="border: solid black 1px">
+php
+</div><hr style="border: solid black 1px">
 			<button type="submit" id="print" onclick="printPage()">Print</button>	
 			<p style = "margin-left:30px; margin-top:5px; margin-bottom: 0px;font-size:14pt; font-style: italic; ">Member List&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
         <div align="right">
@@ -68,7 +69,10 @@ function printPage() {
         </div>			
 		<br/>
 <?php
-						$result= mysqli_query($con,"SELECT * from book where book_title='".$_SESSION['book_title']."' AND book_pub='".$_SESSION['book_pub']."' order by book_id DESC ") OR die (mysqli_error($con));
+						$stmt = $con->prepare("SELECT * from book where book_title=? AND book_pub=? order by book_id DESC");
+						$stmt->bind_param("ss", $_SESSION['book_title'], $_SESSION['book_pub']);
+						$stmt->execute() OR die ($con->error);
+						$result = $stmt->get_result();
 ?>
 						<table class="table table-striped">
 						  <thead>
@@ -101,11 +105,8 @@ function printPage() {
 								<td	style="text-align:center;"><?php echo $row['publisher_name']; ?></td>
 								<td	style="text-align:center;"><?php echo $row['copyright_year']; ?></td> 
 							
-								<td	style="text-align:center;"><?php echo $row['category']; ?></td> 
-								<td	style="text-align:center;"><?php echo $row['status']; ?></td> 
-							</tr>
-							
-							<?php 
+php
+<?php 
 							}					
 							?>
 						  </tbody> 
@@ -115,8 +116,11 @@ function printPage() {
 <br />
 							<?php
 								
-								$user_query=mysqli_query($con,"select * from admin where admin_id='$id_session'")or die(mysql_error());
-								$row=mysqli_fetch_array($user_query); {
+								$stmt = $con->prepare("SELECT * FROM admin WHERE admin_id=?");
+								$stmt->bind_param("i", $id_session);
+								$stmt->execute();
+								$result = $stmt->get_result();
+								$row = $result->fetch_array(MYSQLI_ASSOC);
 							?>        <h2><i class="glyphicon glyphicon-user"></i> <?php echo '<span style="color:blue; font-size:15px;">Prepared by:'."<br /><br /> ".$row['firstname']." ".$row['lastname']." ".'</span>';?></h2>
 								<?php } ?>
 
