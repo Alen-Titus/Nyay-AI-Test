@@ -259,46 +259,65 @@
 									$trapBookCount= mysqli_query ($con,"SELECT count(*) as books_allowed from borrow_book where user_id = '$user_id' and borrowed_status = 'borrowed'") or die (mysqli_error($con));
 									
 									$countBorrowed = mysqli_fetch_assoc($trapBookCount);
-									
-									$bookCountQuery= mysqli_query ($con,"SELECT count(*) as book_count from borrow_book where user_id = '$user_id' and borrowed_status = 'borrowed' and book_id = $book_id") or die (mysqli_error($con));
-									
-									$bookCount = mysqli_fetch_assoc($bookCountQuery);
-									
-									$allowed_book_query= mysqli_query($con,"select * from allowed_book order by allowed_book_id DESC ") or die (mysqli_error($con));
-									$allowed = mysqli_fetch_assoc($allowed_book_query);
-									$result2= mysqli_query ($con,"SELECT status from book where book_id = $book_id") or die (mysqli_error($con));
-									
-									$bookStatus2 = mysqli_fetch_array($result2);
-									$result= mysqli_query ($con,"SELECT remarks from book where book_id = $book_id") or die (mysqli_error($con));
-									
-									$bookStatus = mysqli_fetch_array($result);
-									
-									
-									if ($countBorrowed['books_allowed'] == $allowed['qntty_books']){
-										echo "<script>alert(' ".$allowed['qntty_books']." ".'Books Allowed per User!'." '); window.location='borrow_book.php?roll_number=".$roll_number."'</script>";
-									}elseif ($bookCount['book_count'] == 1){
-										echo "<script>alert('Book Already Borrowed!'); window.location='borrow_book.php?roll_number=".$roll_number."'</script>";
-									}elseif ($bookStatus2['status'] == "Lost"){
-										echo "<script>alert('This book is LOST!'); window.location='borrow_book.php?roll_number=".$roll_number."'</script>";
-									}elseif ($bookStatus['remarks'] == "Not Available"){
-										echo "<script>alert('Book Already Issued to Someone!'); window.location='borrow_book.php?roll_number=".$roll_number."'</script>";
-									}else{
-										
-									mysqli_query($con,"UPDATE book SET remarks = 'Not Available' where book_id = '$book_id' ") or die (mysqli_error($con));
-									
-									mysqli_query($con,"INSERT INTO borrow_book(user_id,book_id,date_borrowed,due_date,borrowed_status)
-									VALUES('$user_id','$book_id','$date_borrowed','$due_date','borrowed')") or die (mysqli_error($con));
-									
-									$report_history=mysqli_query($con,"select * from admin where admin_id = $id_session ") or die (mysqli_error($con));
-									$report_history_row=mysqli_fetch_array($report_history);
-									$admin_row=$report_history_row['firstname']." ".$report_history_row['middlename']." ".$report_history_row['lastname'];	
-									
-									mysqli_query($con,"INSERT INTO report 
-									(book_id, user_id, admin_name, detail_action, date_transaction)
-									VALUES ('$book_id','$user_id','$admin_row','Borrowed Book',NOW())") or die(mysqli_error($con));
-									
-									}
-									
+php
+$bookCountQuery = mysqli_query($con, "SELECT count(*) as book_count from borrow_book where user_id = ? and borrowed_status = 'borrowed' and book_id = ?", array($user_id, $book_id)) or die(mysqli_error($con));
+
+$bookCount = mysqli_fetch_assoc($bookCountQuery);
+
+$allowedBookQuery = mysqli_query($con, "SELECT * FROM allowed_book ORDER BY allowed_book_id DESC") or die(mysqli_error($con));
+$allowed = mysqli_fetch_assoc($allowedBookQuery);
+$result2 = mysqli_query($con, "SELECT status FROM book WHERE book_id = ?", array($book_id)) or die(mysqli_error($con));
+
+$bookStatus2 = mysqli_fetch_array($result2);
+$result = mysqli_query($con, "SELECT remarks FROM book WHERE book_id = ?", array($book_id)) or die(mysqli_error($con));
+
+$bookStatus = mysqli_fetch_array($result);
+
+if ($countBorrowed['books_allowed'] == $allowed['qntty_books']) {
+    echo "<script>alert(' " . $allowed['qntty_books'] . " 'Books Allowed per User!'); window.location='borrow_book.php?roll_number=" . $roll_number . "'</script>";
+} elseif ($bookCount['book_count'] == 1) {
+php
+}elseif ($bookCount['book_count'] == 1){
+	echo "<script>alert('Book Already Borrowed!'); window.location='borrow_book.php?roll_number=" . htmlspecialchars($roll_number) . "'</script>";
+php
+echo "<script>alert('This book is LOST!'); window.location='borrow_book.php?roll_number=" . htmlspecialchars($roll_number) . "'</script>";
+} elseif ($bookStatus['remarks'] == "Not Available") {
+    echo "<script>alert('Book Already Issued to Someone!'); window.location='borrow_book.php?roll_number=" . htmlspecialchars($roll_number) . "'</script>";
+} else {
+    $sql = "UPDATE book SET remarks = 'Not Available' WHERE book_id = ?";
+    $stmt = mysqli_prepare($con, $sql);
+    if (mysqli_stmt_execute($stmt)) {
+        $sql = "INSERT INTO borrow_book(user_id,book_id,date_borrowed,due_date,borrowed_status)
+                VALUES(?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($con, $sql);
+        mysqli_stmt_bind_param($stmt, 'iiiiis', $user_id, $book_id, $date_borrowed, $due_date, 'borrowed');
+        if (mysqli_stmt_execute($stmt)) {
+            $sql = "SELECT * FROM admin WHERE admin_id = ?";
+            $stmt = mysqli_prepare($con, $sql);
+            mysqli_stmt_bind_param($stmt, 'i', $id_session);
+            if ($report_history = mysqli_stmt_get_result($stmt)) {
+                $report_history_row = mysqli_fetch_array($report_history);
+                $admin_row = $report_history_row['firstname'] . " " . $report_history_row['middlename'] . " " . $report_history_row['lastname'];
+                $sql = "INSERT INTO report 
+                        (book_id, user_id, admin_name, detail_action, date_transaction)
+                        VALUES (?, ?, ?, ?, NOW())";
+                $stmt = mysqli_prepare($con, $sql);
+                mysqli_stmt_bind_param($stmt, 'iiiiis', $book_id, $user_id, $admin_row, 'Borrowed Book');
+                if (mysqli_stmt_execute($stmt)) {
+                    // do nothing
+                } else {
+                    die(mysqli_error($con));
+                }
+            } else {
+                die(mysqli_error($con));
+            }
+        } else {
+            die(mysqli_error($con));
+        }
+    } else {
+        die(mysqli_error($con));
+    }
+}
 							?>
 									<script>
 										window.location="borrow_book.php?roll_number=<?php echo $roll_number ?>";
