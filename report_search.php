@@ -65,7 +65,8 @@
     	$_SESSION['datefrom'] = $_POST['datefrom'];
     	$_SESSION['dateto'] = $_POST['dateto'];
     ?>
-									<th>Members Name</th>
+php
+<th>Members Name</th>
                                     <th>Book Title</th>
                                     <th>Task</th>
                                     <th>Person In Charge</th>
@@ -75,10 +76,31 @@
 							<tbody>
 							<?php
     	
+							$datefrom = $_POST['datefrom'];
+							$dateto = $_POST['dateto'];
+
+							if (!is_string($datefrom) || !is_string($dateto)) {
+								throw new Exception('Invalid date input');
+							}
+
+							try {
+								$datefrom = DateTime::createFromFormat('Y-m-d', $datefrom);
+								$dateto = DateTime::createFromFormat('Y-m-d', $dateto);
+							} catch (Exception $e) {
+								throw new Exception('Invalid date format. Please use YYYY-MM-DD');
+							}
+
+							if ($datefrom > $dateto) {
+								throw new Exception('Invalid date range');
+							}
+
+							$datefrom = $datefrom->format('Y-m-d H:i:s');
+							$dateto = $dateto->format('Y-m-d H:i:s');
+
 							$result= mysqli_query($con,"select * from report 
                             LEFT JOIN book ON report.book_id = book.book_id 
                             LEFT JOIN user ON report.user_id = user.user_id 
-							where date_transaction BETWEEN '".$_POST['datefrom']." 00:00:01' and '".$_POST['dateto']." 23:59:59' order by report.report_id DESC ") or die (mysqli_error($con));
+							where date_transaction BETWEEN '$datefrom' and '$dateto' order by report.report_id DESC ") or die (mysqli_error($con));
 							
 							while ($row= mysqli_fetch_array ($result) ){
                             $id=$row['report_id'];

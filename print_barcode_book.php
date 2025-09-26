@@ -114,7 +114,8 @@ if (!isset($_SESSION['book_title']) || !isset($_SESSION['book_pub'])) {
                 </tr>
                 <?php
                         }
-                    } else {
+php
+} else {
                         echo '<tr><td colspan="3" style="text-align:center;">No books found matching the criteria.</td></tr>';
                     }
                     mysqli_stmt_close($stmt);
@@ -124,13 +125,21 @@ if (!isset($_SESSION['book_title']) || !isset($_SESSION['book_pub'])) {
         <br />
         <br />
         <?php
-            $user_query = mysqli_query($con, "SELECT firstname, lastname FROM admin WHERE admin_id='$id_session'") or die(mysqli_error($con));
-            if ($row = mysqli_fetch_array($user_query)) {
+            $user_query = mysqli_prepare($con, "SELECT firstname, lastname FROM admin WHERE admin_id=?");
+            mysqli_stmt_bind_param($user_query, 'i', $id_session);
+            if (mysqli_stmt_execute($user_query)) {
+                $result = mysqli_stmt_get_result($user_query);
+                if ($row = mysqli_fetch_array($result)) {
         ?>
         <div style="margin-left: 28px;">
             <p><strong>Prepared by:</strong><br><?php echo htmlspecialchars($row['firstname'] . " " . $row['lastname']); ?></p>
         </div>
-        <?php } ?>
+        <?php } else { echo '<tr><td colspan="3" style="text-align:center;">No books found matching the criteria.</td></tr>'; }
+            } else {
+                echo mysqli_error($con);
+            }
+            mysqli_stmt_close($user_query);
+        ?>
     </div>
 </body>
 </html>
