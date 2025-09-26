@@ -35,27 +35,31 @@
 									<th>First Name</th>
 									<th>Middle Name</th>
 									<th>Last Name</th>
-									<th>Adhaar-ID</th>
-									<th>Contact</th>
-									<th>Date Added</th>
-								</tr>
-							</thead>
-							<tbody>
+php
+<th>Adhaar-ID</th>
+<th>Contact</th>
+<th>Date Added</th>
+</tr>
+</thead>
+<tbody>
 <?php
-			   
-		if (isset($_GET['admin_id']))
-		$id=$_GET['admin_id'];
-		$result1 = mysqli_query($con,"SELECT * FROM admin WHERE admin_id='$id'");
-		while($row = mysqli_fetch_array($result1)){
-		?>
-							<tr>
-								<td>
-									<?php if($row['admin_image'] != ""): ?>
-									<img src="upload/<?php echo $row['admin_image']; ?>" width="100px" height="100px" style="border:4px groove #CCCCCC; border-radius:5px;">
-									<?php else: ?>
-									<img src="images/user.png" width="100px" height="100px" style="border:4px groove #CCCCCC; border-radius:5px;">
-									<?php endif; ?>	
-								</td> 
+if (isset($_GET['admin_id'])) {
+    $id = $_GET['admin_id'];
+    $result1 = mysqli_query($con, "SELECT * FROM admin WHERE admin_id = '$id'");
+    while ($row = mysqli_fetch_array($result1)) {
+        ?>
+<tr>
+    <td>
+        <?php if (!empty($row['admin_image'])): ?>
+        <img src="upload/<?php echo $row['admin_image']; ?>" width="100px" height="100px" style="border:4px groove #CCCCCC; border-radius:5px;">
+        <?php else: ?>
+        <img src="images/user.png" width="100px" height="100px" style="border:4px groove #CCCCCC; border-radius:5px;">
+        <?php endif; ?>	
+    </td>
+<?php
+}
+}
+?>
 								<td><?php echo $row['firstname']; ?></td> 
 								<td><?php echo $row['middlename']; ?></td> 
 								<td><?php echo $row['lastname']; ?></td> 

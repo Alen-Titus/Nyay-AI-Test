@@ -37,7 +37,8 @@
 									<th>Gender</th>
 									<th>Member Type</th>
 									<th>Branch</th>
-									<th>Contact</th>
+php
+<th>Contact</th>
 									<th>Address</th>
 									<th>Date Added</th>
 								</tr>
@@ -47,7 +48,10 @@
 			   
 		if (isset($_GET['user_id']))
 		$id=$_GET['user_id'];
-		$result1 = mysqli_query($con,"SELECT * FROM user WHERE user_id='$id'");
+		$stmt = $con->prepare("SELECT * FROM user WHERE user_id=?");
+		$stmt->bind_param("i", $id);
+		$stmt->execute();
+		$result1 = $stmt->get_result();
 		while($row = mysqli_fetch_array($result1)){
 		?>
 							<tr>
@@ -57,7 +61,7 @@
 								<td><?php echo $row['type']; ?></td> 
 								<td><?php echo $row['branch']; ?></td>
 								<td><?php echo $row['contact']; ?></td> 
-								<td><?php echo $row['address']; ?></td> 
+								<td><?php echo $row['address']; ?></td>
 								<td><?php echo date("M d, Y h:m:s a", strtotime($row['user_added'])); ?></td>
 							</tr>
 							<?php } ?>

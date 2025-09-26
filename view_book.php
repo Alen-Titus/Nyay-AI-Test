@@ -39,27 +39,32 @@
 									<th>Publication</th>
 									<th>Publisher</th>
 									<th>Copyright</th>
-								
-									<th>Category</th>
-									<th>Status</th>
-								</tr>
-							</thead>
-							<tbody>
+php
+<th>Category</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
 <?php
-			   
-		if (isset($_GET['book_id']))
-		$id=$_GET['book_id'];
-		$result1 = mysqli_query($con,"SELECT * FROM book WHERE book_id='$id'");
-		while($row = mysqli_fetch_array($result1)){
-		?>
-							<tr>
-								<td>
-								<?php if($row['book_image'] != ""): ?>
-								<img src="upload/<?php echo $row['book_image']; ?>" width="150px" height="180px" style="border:1px solid black; border-radius:5px;">
-								<?php else: ?>
-								<img src="images/book_image.jpg" width="150px" height="180px" style="border:1px solid black; border-radius:5px;">
-								<?php endif; ?>
-								</td> 
+   if (isset($_GET['book_id'])) {
+       $id = $_GET['book_id'];
+       $result1 = mysqli_query($con, "SELECT * FROM book WHERE book_id = '$id'");
+       while ($row = mysqli_fetch_array($result1)) {
+           ?>
+<tr>
+    <td>
+        <?php if (!empty($row['book_image'])): ?>
+            <img src="upload/<?php echo $row['book_image']; ?>" width="150px" height="180px"
+                 style="border: 1px solid black; border-radius: 5px;">
+        <?php else: ?>
+            <img src="images/book_image.jpg" width="150px" height="180px"
+                 style="border: 1px solid black; border-radius: 5px;">
+        <?php endif; ?>
+    </td>
+<?php
+       }
+   }
+?>
 								<td><?php echo $row['book_barcode']; ?></td>
 								<td style="word-wrap: break-word; width: 10em;"><?php echo $row['book_title']; ?></td>
 								<td style="word-wrap: break-word; width: 10em;"><?php echo $row['author']."<br />".$row['author_2']."<br />".$row['author_3']."<br />".$row['author_4']."<br />".$row['author_5']; ?></td>
