@@ -40,7 +40,8 @@ include ('header.php');
                                         </select>  
 				<br />
 				<br />
-						<button name="submit" type="submit" class="btn btn-primary" style="margin-left:110px;"><i class="glyphicon glyphicon-log-in"></i> Submit</button>
+php
+<button name="submit" type="submit" class="btn btn-primary" style="margin-left:110px;"><i class="glyphicon glyphicon-log-in"></i> Submit</button>
 						</form>
  
 <?php
@@ -50,7 +51,7 @@ include ('header.php');
 
 	$roll_number = $_POST['roll_number'];
 
-	$sql = mysqli_query($con,"SELECT * FROM user WHERE roll_number = '$roll_number' ");
+	$sql = mysqli_query($con, "SELECT * FROM user WHERE roll_number = '$roll_number' ");
 	$count = mysqli_num_rows($sql);
 	$row = mysqli_fetch_array($sql);
 
@@ -58,7 +59,7 @@ include ('header.php');
 			echo "<div class='alert alert-success'>".'No match found for the School ID Number'."</div>";
 		}else{
 			$roll_number = $_POST['roll_number'];
-			header('location: borrow_book.php?roll_number='.$roll_number);
+			header('location: borrow_book.php?roll_number='.mysqli_real_escape_string($con, $roll_number));
 		}
 	}
 ?>

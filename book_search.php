@@ -97,20 +97,24 @@
                                         </select>  
                                     </div>
 							
-										<button name="submit" type="submit" class="btn btn-primary" style=""><i class="glyphicon glyphicon-log-in"></i> Submit</button>
+php
+<button name="submit" type="submit" class="btn btn-primary" style=""><i class="glyphicon glyphicon-log-in"></i> Submit</button>
 								</form>
                         	
                         </div>
                         
 						<?php
-                        $book_title = $_POST['book_title'];
-						//		$category = $_POST['category'];
-						//		$author = $_POST['author'];
-						$book_pub = $_POST['book_pub'];
-                    	$result= mysqli_query($con,"SELECT COUNT(book_id) AS total from book where book_title='$book_title' AND book_pub='$book_pub' ") OR die (mysqli_error($con));
-                    	$row=mysqli_fetch_assoc($result);
-                    	$count=$row['total'];
-                    	echo "<span style='color:red;font-size:16px;font-weight:bold;Times New Roman, Times, serif';>Total Numbers of Book is = ".$count."</span";
+						if (isset($_POST['book_title'])) {
+							$book_title = $_POST['book_title'];
+							$book_pub = $_POST['book_pub'];
+							$stmt = $con->prepare("SELECT COUNT(book_id) AS total FROM book WHERE book_title=? AND book_pub=?");
+							$stmt->bind_param("ss", $book_title, $book_pub);
+							$stmt->execute();
+							$result = $stmt->get_result();
+							$row = $result->fetch_assoc();
+							$count = $row['total'];
+							echo "<span style='color:red;font-size:16px;font-weight:bold;Times New Roman, Times, serif';>Total Numbers of Book is = ".$count."</span>";
+						}
                         ?>
                         <br><br><br>
 
@@ -128,10 +132,7 @@
 									<th>Category</th>
 									<th>Status</th>
 									<th>Remarks</th>
-									<th>Action</th>
-								</tr>
-							</thead>
-							<tbody>
+php
 <?php 
 								$_SESSION['book_title'] = $_POST['book_title'];
 							//	$_SESSION['category'] = $_POST['category'];
@@ -142,6 +143,9 @@
 							
 							<?php
 									
+							$book_title = mysqli_real_escape_string($con, $_SESSION['book_title']);
+							$book_pub = mysqli_real_escape_string($con, $_SESSION['book_pub']);
+
 							$result= mysqli_query($con,"SELECT * from book where book_title='$book_title' AND book_pub='$book_pub' order by book_id DESC ") OR die (mysqli_error($con));
 						
 
@@ -152,10 +156,11 @@
 								<td><a target="_blank" href="print_barcode_individual.php?code=<?php echo $row['book_barcode']; ?>"><?php echo $row['book_barcode']; ?></a></td>
 								<td style="word-wrap: break-word; width: 10em;"><?php echo $row['book_title']; ?></td>
 								<td style="word-wrap: break-word; width: 10em;"><?php echo $row['author']."<br />".$row['author_2']."<br />".$row['author_3']."<br />".$row['author_4']."<br />".$row['author_5']; ?></td>
-								<td><?php echo $row['book_pub']; ?></td> 
-								<td><?php echo $row['category']; ?></td> 
-								<td><?php echo $row['status']; ?></td> 
-								<td><?php echo $row['remarks']; ?></td> 
+								<td><?php echo $row['book_pub']; ?></td>
+								<td><a target="_blank" href="print_barcode_individual.php?code=<?php echo $row['book_barcode']; ?>"><?php echo $row['book_barcode']; ?></a></td>
+								<td style="word-wrap: break-word; width: 10em;"><?php echo $row['book_title']; ?></td>
+php
+<td><?php echo htmlspecialchars($row['remarks']); ?></td> 
 								<td>
 									<a class="btn btn-primary" for="ViewAdmin" href="view_book.php<?php echo '?book_id='.$id; ?>">
 										<i class="fa fa-search"></i>
@@ -165,13 +170,16 @@
 									<i class="fa fa-edit"></i>
 									</a>
 									<?php
-									$user_query=mysqli_query($con,"select *  from admin where admin_id='$id_session'")or die(mysqli_error($con));
+									$user_query=mysqli_query($con,"SELECT * FROM admin WHERE admin_id= '$id_session'")or die(mysqli_error($con));
 										$row=mysqli_fetch_array($user_query);
-
-
+										
 									if($row['admin_type']=='Admin') { ?>
 									<a class="btn btn-danger" for="DeleteAdmin" href="#delete<?php echo $id;?>" data-toggle="modal" data-target="#delete<?php echo $id;?>">
 										<i class="glyphicon glyphicon-trash icon-white"></i>
+									</a>
+									<?php } ?>
+			
+									<!-- delete modal user -->
 									</a>
 									<?php } ?>
 			
