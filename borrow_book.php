@@ -122,31 +122,29 @@
 									$date_borrowed= $_POST['date_borrowed'];
 									$due_date= $_POST['due_date'];
 									$date_returned_now = $_POST['date_returned'];
+php
+mysqli_query($con, "UPDATE book SET remarks = ? WHERE book_id = ?", array('Available', $book_id)) or die(mysqli_error($con));
 
-									
-									mysqli_query($con,"UPDATE book SET remarks = 'Available' where book_id = '$book_id' ") or die (mysqli_error($con));
-								
-									
-									mysqli_query ($con,"UPDATE borrow_book SET borrowed_status = 'returned', date_returned = '$date_returned_now', book_penalty = '$penalty' WHERE borrow_book_id= '$borrow_book_id' and user_id = '$user_id' and book_id = '$book_id' ") or die (mysqli_error($con));
-									
-									mysqli_query ($con,"INSERT INTO return_book (user_id, book_id, date_borrowed, due_date, date_returned, book_penalty)
-									values ('$user_id', '$book_id', '$date_borrowed', '$due_date', '$date_returned', '$penalty')") or die (mysqli_error($con));
-									
-									$report_history1=mysqli_query($con,"select * from admin where admin_id = $id_session ") or die (mysqli_error($con));
-									$report_history_row1=mysqli_fetch_array($report_history1);
-									$admin_row1=$report_history_row1['firstname']." ".$report_history_row1['middlename']." ".$report_history_row1['lastname'];	
-									
-									mysqli_query($con,"INSERT INTO report 
-									(book_id, user_id, admin_name, detail_action, date_transaction)
-									VALUES ('$book_id','$user_id','$admin_row1','Returned Book',NOW())") or die(mysqli_error($con));
-									
-							?>
-									<script>
-										window.location="borrow_book.php?roll_number=<?php echo $roll_number ?>";
-									</script>
-							<?php 
-																}
-							?>
+mysqli_query($con, "UPDATE borrow_book SET borrowed_status = ?, date_returned = ?, book_penalty = ? 
+WHERE borrow_book_id= ? AND user_id = ? AND book_id = ?", 
+array('returned', $date_returned_now, $penalty, $borrow_book_id, $user_id, $book_id)) or die(mysqli_error($con));
+
+mysqli_query($con, "INSERT INTO return_book (user_id, book_id, date_borrowed, due_date, date_returned, book_penalty)
+VALUES (?, ?, ?, ?, ?, ?)", 
+array($user_id, $book_id, $date_borrowed, $due_date, $date_returned_now, $penalty)) or die(mysqli_error($con));
+
+$report_history1 = mysqli_query($con, "SELECT * FROM admin WHERE admin_id = ?", array($id_session)) or die(mysqli_error($con));
+$report_history_row1 = mysqli_fetch_array($report_history1);
+$admin_row1 = $report_history_row1['firstname'] . ' ' . $report_history_row1['middlename'] . ' ' . $report_history_row1['lastname'];
+
+mysqli_query($con, "INSERT INTO report 
+(book_id, user_id, admin_name, detail_action, date_transaction)
+VALUES (?, ?, ?, 'Returned Book', NOW())", 
+array($book_id, $user_id, $admin_row1)) or die(mysqli_error($con));
+
+?>
+<script>
+window.location = "borrow_book.php?roll_number=<?php echo $roll_number; ?>";
 							
 							</tbody>
 							</table>
@@ -248,33 +246,27 @@
 							<input type="hidden" name="date_borrowed" class="new_text" id="sd" value="<?php echo $date_borrowed ?>" size="16" maxlength="10"  />
 							
 							<?php 
+php
+<?php 
 								if (isset($_POST['borrow'])){
-									$user_id =$_POST['user_id'];
-									$book_id =$_POST['book_id'];
-									$date_borrowed =$_POST['date_borrowed'];
-									$due_date =$_POST['due_date'];
+									$user_id = $_POST['user_id'];
+php
+$book_id = $_POST['book_id'];
+$date_borrowed = $_POST['date_borrowed'];
+$due_date = $_POST['due_date'];
 
-									
-									
-									$trapBookCount= mysqli_query ($con,"SELECT count(*) as books_allowed from borrow_book where user_id = '$user_id' and borrowed_status = 'borrowed'") or die (mysqli_error($con));
-									
-									$countBorrowed = mysqli_fetch_assoc($trapBookCount);
-									
-									$bookCountQuery= mysqli_query ($con,"SELECT count(*) as book_count from borrow_book where user_id = '$user_id' and borrowed_status = 'borrowed' and book_id = $book_id") or die (mysqli_error($con));
-									
-									$bookCount = mysqli_fetch_assoc($bookCountQuery);
-									
-									$allowed_book_query= mysqli_query($con,"select * from allowed_book order by allowed_book_id DESC ") or die (mysqli_error($con));
-									$allowed = mysqli_fetch_assoc($allowed_book_query);
-									$result2= mysqli_query ($con,"SELECT status from book where book_id = $book_id") or die (mysqli_error($con));
-									
-									$bookStatus2 = mysqli_fetch_array($result2);
-									$result= mysqli_query ($con,"SELECT remarks from book where book_id = $book_id") or die (mysqli_error($con));
-									
-									$bookStatus = mysqli_fetch_array($result);
-									
-									
-									if ($countBorrowed['books_allowed'] == $allowed['qntty_books']){
+$trapBookCount = mysqli_query($con, "SELECT count(*) as books_allowed from borrow_book where user_id = '$user_id' and borrowed_status = 'borrowed'") or die(mysqli_error($con));
+$countBorrowed = mysqli_fetch_assoc($trapBookCount);
+
+$bookCountQuery = mysqli_query($con, "SELECT count(*) as book_count from borrow_book where user_id = '$user_id' and borrowed_status = 'borrowed' and book_id = '$book_id'") or die(mysqli_error($con));
+$bookCount = mysqli_fetch_assoc($bookCountQuery);
+
+$allowed_book_query = mysqli_query($con, "select * from allowed_book order by allowed_book_id DESC ") or die(mysqli_error($con));
+$allowed = mysqli_fetch_assoc($allowed_book_query);
+$result2 = mysqli_query($con, "SELECT status FROM book WHERE book_id = '$book_id'") or die(mysqli_error($con));
+$bookStatus2 = mysqli_fetch_array($result2);
+
+$result = mysqli_query($con, "SELECT remarks FROM book WHERE book_id = '$book_id'") or die(mysqli_error($con));
 										echo "<script>alert(' ".$allowed['qntty_books']." ".'Books Allowed per User!'." '); window.location='borrow_book.php?roll_number=".$roll_number."'</script>";
 									}elseif ($bookCount['book_count'] == 1){
 										echo "<script>alert('Book Already Borrowed!'); window.location='borrow_book.php?roll_number=".$roll_number."'</script>";
