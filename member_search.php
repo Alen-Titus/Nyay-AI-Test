@@ -47,7 +47,8 @@
 									<th>Address</th>
 									<th>Member Added</th>
 									<th>Action</th>
-								</tr>
+php
+</tr>
 							</thead>
 							<tbody>
 <?php 
@@ -56,34 +57,39 @@
 ?>
 							
 							<?php
-
-							$result= mysqli_query($con,"SELECT * from user where roll_number='$roll_number'") OR die (mysqli_error($con));
-						
-							$row= mysqli_fetch_array ($result);
-							$id=$row['user_id'];
+								$stmt = mysqli_prepare($con, "SELECT * from user where roll_number=?");
+								mysqli_stmt_bind_param($stmt, 's', $roll_number);
+								mysqli_stmt_execute($stmt);
+								$result = mysqli_stmt_get_result($stmt);
+								mysqli_stmt_close($stmt);
+								
+								if ($row = mysqli_fetch_array($result)) {
+									$id = $row['user_id'];
+								}
 							?>
 							<tr>
-				
-								<td><?php echo $row['roll_number']; ?></td> 
-								<td><?php echo $row['firstname']." ".$row['middlename']." ".$row['lastname']; ?></td> 
-						<!--	<td><?php echo $row['gender']; ?></td>     -->
-								<td><?php echo $row['type']; ?></td> 
-								<td><?php echo $row['branch']; ?></td> 
-								<td><?php echo $row['contact']; ?></td> 
-								<td><?php echo $row['address']; ?></td> 
-								<td><?php echo $row['user_added']; ?></td> 
+php
+<td><?php echo htmlspecialchars($row['branch']); ?></td> 
+								<td><?php echo htmlspecialchars($row['contact']); ?></td> 
+								<td><?php echo htmlspecialchars($row['address']); ?></td> 
+								<td><?php echo htmlspecialchars($row['user_added']); ?></td> 
 								<td>
-									<a class="btn btn-primary" for="ViewAdmin" href="view_member.php<?php echo '?user_id='.$id; ?>">
+									<a class="btn btn-primary" for="ViewAdmin" href="view_member.php?user_id=<?php echo htmlspecialchars($id); ?>">
 										<i class="fa fa-search"></i>
 									</a>
 									<?php
 										include('include/dbcon.php');
-										$user_query=mysqli_query($con,"select *  from admin where admin_id='$id_session'")or die(mysqli_error($con));
+										$user_query=mysqli_query($con,"SELECT * FROM admin WHERE admin_id = '$id_session'")or die(mysqli_error($con));
 										$row=mysqli_fetch_array($user_query); {
 									?>
 									<?php if($row['admin_type']=='Admin') { ?>
-									<a class="btn btn-warning" href="edit_member.php<?php echo '?user_id='.$id; ?>">
+									<a class="btn btn-warning" href="edit_member.php?user_id=<?php echo htmlspecialchars($id); ?>">
 									<i class="fa fa-edit"></i>
+									</a>
+									<a class="btn btn-danger" for="DeleteAdmin" href="#delete<?php echo $id;?>" data-toggle="modal" data-target="#delete<?php echo $id;?>">
+										<i class="glyphicon glyphicon-trash icon-white"></i>
+									</a>
+									<?php } ?><?php } ?>
 									</a>
 									<a class="btn btn-danger" for="DeleteAdmin" href="#delete<?php echo $id;?>" data-toggle="modal" data-target="#delete<?php echo $id;?>">
 										<i class="glyphicon glyphicon-trash icon-white"></i>

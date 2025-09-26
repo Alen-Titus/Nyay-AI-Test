@@ -27,7 +27,8 @@
 													<a class="btn btn-primary" for="ViewAdmin" href="#penalty_edit<?php echo $penalty_id; ?>" data-toggle="modal" data-target="#penalty_edit<?php echo $penalty_id;?>">
 														<i class="fa fa-edit"></i> Edit
 													</a>
-												</td>
+php
+</td>
 									<!-- edit modal -->
 									<div class="modal fade" id="penalty_edit<?php  echo $penalty_id;?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 									<div class="modal-dialog">
@@ -37,8 +38,10 @@
 										</div>
 										<div class="modal-body">
 												<?php
-												$query2=mysqli_query($con,"select * from penalty where penalty_id='$penalty_id'")or die(mysql_error());
-												$row44=mysqli_fetch_array($query2);
+												$query2=mysqli_prepare($con, "SELECT * FROM penalty WHERE penalty_id=?");
+												mysqli_stmt_bind_param($query2, 'i', $penalty_id);
+												mysqli_stmt_execute($query2) or die(mysqli_error($con));
+												$row44=mysqli_fetch_array(mysqli_stmt_get_result($query2));
 												?>
 												<form method="post" enctype="multipart/form-data" class="form-horizontal">
 													<div class="form-group" style="margin-left:170px;">
@@ -47,10 +50,8 @@
 														<div class="col-md-3">
 															<input type="number" min="0" max="100" step="1" name="penalty_amount" value="<?php echo $row44['penalty_amount']; ?>" id="first-name2" class="form-control">
 														</div>
-													</div>
-													<div class="modal-footer" style="margin-top:50px;">
-													<button class="btn btn-inverse" data-dismiss="modal" aria-hidden="true"><i class="glyphicon glyphicon-remove icon-white"></i> No</button>
-													<button type="submit" style="margin-bottom:5px;" name="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok icon-white"></i> Yes</button>
+php
+<button type="submit" style="margin-bottom:5px;" name="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok icon-white"></i> Yes</button>
 													</div>
 												</form>
 												
@@ -59,15 +60,17 @@
 													
 													$penalty_amount1 = $_POST['penalty_amount'];
 													
-													{
-														mysqli_query ($con," UPDATE penalty SET penalty_amount='$penalty_amount1' ") or die (mysqli_error());
-													}
-													{
-														echo "<script>alert('Edit Successfully!'); window.location='settings.php'</script>";
-													}
-														
+													$stmt = mysqli_prepare($con, "UPDATE penalty SET penalty_amount=?");
+													mysqli_stmt_bind_param($stmt, 's', $penalty_amount1);
+													mysqli_stmt_execute($stmt) or die(mysqli_error());
+													mysqli_stmt_close($stmt);
+													
+													echo "<script>alert('Edit Successfully!'); window.location='settings.php'</script>";
 													}
 												?>
+												
+										</div>
+										</div>
 												
 										</div>
 										</div>

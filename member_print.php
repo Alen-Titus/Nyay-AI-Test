@@ -102,7 +102,8 @@ function printPage() {
 							
 							<?php 
 							}					
-							?>
+php
+?>
 						  </tbody> 
 					  </table> 
 
@@ -111,18 +112,15 @@ function printPage() {
 							<?php
 								include('include/dbcon.php');
 								
-
-								$user_query=mysqli_query($con,"select * from admin where admin_id='$id_session'")or die(mysqli_error($con));
-								$row=mysqli_fetch_array($user_query); 
+								$stmt = $con->prepare("SELECT * FROM admin WHERE admin_id=?");
+								$stmt->bind_param("i", $id_session);
+								$stmt->execute();
+								$result = $stmt->get_result();
+								$row = $result->fetch_array(MYSQLI_ASSOC);
 								{
 							?>        <h2><span style="font-size: 15px" class="glyphicon glyphicon-user"></span> 
 								<?php echo '<span style="color:blue; font-size:13px;">Prepared by:'."<br /><br /> ".$row['firstname']." ".$row['lastname']." ".'</span>';?></h2>
 								<?php } ?>
-
-
-			</div>
-	
-	
 	
 	
 
