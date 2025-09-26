@@ -30,7 +30,7 @@
     <script src="js/input_mask/jquery.inputmask.js"></script>
     <!-- knob -->
     <script src="js/knob/jquery.knob.min.js"></script>
-    <!-- range slider -->
+<!-- range slider -->
     <script src="js/ion_range/ion.rangeSlider.min.js"></script>
     <!-- color picker -->
     <script src="js/colorpicker/bootstrap-colorpicker.js"></script>
@@ -51,6 +51,36 @@
                 console.log(start.toISOString(), end.toISOString(), label);
                 $('#reportrange_right span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
                 //alert("Callback has fired: [" + start.format('MMMM D, YYYY') + " to " + end.format('MMMM D, YYYY') + ", label = " + label + "]");
+            };
+
+            $.fn.datepicker.dates['en'] = {
+                days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                daysMin: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+                months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                monthsShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                today: "Today",
+                clear: "Clear"
+            };
+
+            $('#reportrange_right').daterangepicker({
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                },
+                alwaysShowCalendars: true,
+                showDropdowns: true,
+                startDate: moment().subtract(29, 'days'),
+                endDate: moment(),
+                opens: "right",
+                format: "YYYY-MM-DD"
+            }, cb);
+        });
+    </script>
             }
 
             var optionSet1 = {
