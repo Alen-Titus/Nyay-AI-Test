@@ -61,7 +61,8 @@ function printPage() {
 				<center><h5 style = "font-style:Calibri; margin-top:-14px;"></h5> &nbsp; &nbsp;Demo Institute Of Pharmacy - 551</center>
 				<center><h5 style = "font-style:Calibri; margin-top:-14px;"></h5>  Library Management System</center>
 					
-				</div><hr style="border: solid black 1px">
+php
+</div><hr style="border: solid black 1px">
 	<button type="submit" id="print" onclick="printPage()">Print</button>	
 			<p style = "margin-left:30px; margin-top:5px; margin-bottom: 0px;font-size:14pt; font-style: italic; ">Barcode List&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
         <div align="right">
@@ -71,7 +72,7 @@ function printPage() {
         </div>			
 		<br/>
 <?php
-							$result= mysqli_query($con,"select * from book order by book_id DESC LIMIT $n") or die (mysqli_error($con));
+							$result= mysqli_query($con,"SELECT * FROM book ORDER BY book_id DESC LIMIT ?i", array($n)) or die (mysqli_error($con));
 ?>
 <div class="row">
 		<?php
@@ -92,4 +93,3 @@ function printPage() {
 </div>
 </body>
 </html>
-

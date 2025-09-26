@@ -65,27 +65,26 @@
 								<tr>
     <?php
     	$_SESSION['datefrom'] = $_POST['datefrom'];
-    	$_SESSION['dateto'] = $_POST['dateto'];
-    ?>
-									<th style="width:160px;">Name</th>
-									<th style="width:160px;">Member Type</th>
-									<th style="width:160px;">Date Log In</th>
-								</tr>
-							</thead>
-							<tbody>
-							<?php
-    	
-							$result= mysqli_query($con,"select * from user_log 
-							where date_log BETWEEN '".$_POST['datefrom']." 00:00:01' and '".$_POST['dateto']." 23:59:59' 
-							order by user_log_id DESC ") or die (mysqli_error($con));
-							
-							while ($row= mysqli_fetch_array ($result) ){
-							$id=$row['user_log_id'];					
-							?>
-							<tr>
-								<td><?php echo $row['firstname']." ".$row['middlename']." ".$row['lastname']; ?></td>
-								<td><?php echo $row['admin_type']; ?></td>
-								<td><?php echo date("M d, Y h:i:s a", strtotime($row['date_log'])); ?></td> 
+php
+$_SESSION['dateto'] = htmlspecialchars($_POST['dateto']);
+?>
+<th style="width:160px;">Name</th>
+<th style="width:160px;">Member Type</th>
+<th style="width:160px;">Date Log In</th>
+</tr>
+</thead>
+<tbody>
+<?php
+$result= mysqli_query($con,"SELECT * FROM user_log 
+WHERE date_log BETWEEN '".mysqli_real_escape_string($con, $_POST['datefrom'])." 00:00:01' AND '".mysqli_real_escape_string($con, $_SESSION['dateto'])." 23:59:59' 
+ORDER BY user_log_id DESC") or die (mysqli_error($con));
+while ($row= mysqli_fetch_array ($result) ){
+$id=$row['user_log_id'];					
+?>
+<tr>
+	<td><?php echo $row['firstname']." ".$row['middlename']." ".$row['lastname']; ?></td>
+	<td><?php echo $row['admin_type']; ?></td>
+	<td><?php echo date("M d, Y h:i:s a", strtotime($row['date_log'])); ?></td>
 							</tr>
 							<?php	}	?>
 							</tbody>

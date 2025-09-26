@@ -87,27 +87,25 @@ function printPage() {
 ?>
 						<tr>
 								<td style="text-align: center;"><?php echo $row['firstname']." ".$row['middlename']." ".$row['lastname']; ?></td>
-								<td style="text-align: center;"><?php echo $row['admin_type']; ?></td>
+php
+<td style="text-align: center;"><?php echo htmlspecialchars($row['admin_type']); ?></td>
 								<td style="text-align: center;"><?php echo date("M d, Y h:i:s a", strtotime($row['date_log'])); ?></td> 
 							</tr>
-							<?php	}	?>
+							<?php } ?>
 							</tbody>
-					  </table> 
+					  </table>
 
 <br />
 <br />
 							<?php
-								$user_query=mysqli_query($con,"select * from admin where admin_id='$id_session'")or die(mysqli_error($con));
-								$row=mysqli_fetch_array($user_query); {
+								$user_query = mysqli_query($con, "SELECT * FROM admin WHERE admin_id = '$id_session'");
+								if (!$user_query) {
+									die(mysqli_error($con));
+								}
+								$row = mysqli_fetch_array($user_query);
+								if ($row !== false) {
 							?>        <h2><i class="glyphicon glyphicon-user"></i> <?php echo '<span style="color:blue; font-size:15px;">Prepared by:'."<br /><br /> ".$row['firstname']." ".$row['lastname']." ".'</span>';?></h2>
 								<?php } ?>
-
-
-			</div>
-	
-	
-	
-	
 
 	</div>
 </body>
