@@ -8,7 +8,8 @@ require_once('include/dbcon.php');
     <!-- Bootstrap core CSS -->
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+html
+<link href="css/bootstrap.min.css" rel="stylesheet">
 
     <link href="fonts/css/font-awesome.min.css" rel="stylesheet">
     <link href="css/animate.min.css" rel="stylesheet">
@@ -18,7 +19,7 @@ require_once('include/dbcon.php');
 
 
     <script src="js/jquery.min.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     
    
 <style>
@@ -29,6 +30,7 @@ html {
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+}
 
 }
 #overlay{

@@ -1,3 +1,4 @@
+php
 <?php
 include ('include/dbcon.php');
 $n = $_GET['loop'];
@@ -5,20 +6,37 @@ $n = $_GET['loop'];
 <html>
 
 <head>
-		<title>Library Management System</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
-		<!--jQuery library--> 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-		<!--Latest compiled and minified JavaScript--> 
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-		<style>
-		
-		
+	<title>Library Management System</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<!--jQuery library--> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<!--Latest compiled and minified JavaScript--> 
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
 .container {
 	width:100%;
 	margin:auto;
 }
+</style>
+
+<?php
+// Validate the 'loop' parameter to prevent potential SQL injection attacks
+if (isset($_GET['loop'])) {
+    $n = filter_var($_GET['loop'], FILTER_SANITIZE_NUMBER_INT);
+} else {
+    // Handle the case where 'loop' is not set
+    $n = 0;
+}
+?>
+
+</head>
+
+<body>
+<!-- Your HTML content here -->
+</body>
+
+</html>
 		
 .table {
     width: 100%;
@@ -92,4 +110,3 @@ function printPage() {
 </div>
 </body>
 </html>
-
