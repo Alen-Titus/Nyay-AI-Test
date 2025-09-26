@@ -66,7 +66,8 @@
     	$_SESSION['datefrom'] = $_POST['datefrom'];
     	$_SESSION['dateto'] = $_POST['dateto'];
     ?>
-									<th>Members Name</th>
+php
+<th>Members Name</th>
                                     <th>Book Title</th>
                                     <th>Task</th>
                                     <th>Person In Charge</th>
@@ -76,10 +77,13 @@
 							<tbody>
 							<?php
     	
-							$result= mysqli_query($con,"select * from report 
+							$datefrom = $_POST['datefrom'];
+							$dateto = $_POST['dateto'];
+
+							$result= mysqli_query($con,"SELECT * FROM report 
                             LEFT JOIN book ON report.book_id = book.book_id 
                             LEFT JOIN user ON report.user_id = user.user_id 
-							where date_transaction BETWEEN '".$_POST['datefrom']." 00:00:01' and '".$_POST['dateto']." 23:59:59' and detail_action='Borrowed Book' order by report.report_id DESC ") or die (mysqli_error($con));
+							WHERE date_transaction BETWEEN '$datefrom 00:00:01' AND '$dateto 23:59:59' AND detail_action='Borrowed Book' ORDER BY report.report_id DESC") or die (mysqli_error($con));
 							
 							while ($row= mysqli_fetch_array ($result) ){
                             $id=$row['report_id'];

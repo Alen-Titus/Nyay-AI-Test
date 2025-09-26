@@ -283,27 +283,25 @@
 									}elseif ($bookStatus['remarks'] == "Not Available"){
 										echo "<script>alert('Book Already Issued to Someone!'); window.location='borrow_book.php?roll_number=".$roll_number."'</script>";
 									}else{
-										
-									mysqli_query($con,"UPDATE book SET remarks = 'Not Available' where book_id = '$book_id' ") or die (mysqli_error($con));
-									
-									mysqli_query($con,"INSERT INTO borrow_book(user_id,book_id,date_borrowed,due_date,borrowed_status)
-									VALUES('$user_id','$book_id','$date_borrowed','$due_date','borrowed')") or die (mysqli_error($con));
-									
-									$report_history=mysqli_query($con,"select * from admin where admin_id = $id_session ") or die (mysqli_error($con));
-									$report_history_row=mysqli_fetch_array($report_history);
-									$admin_row=$report_history_row['firstname']." ".$report_history_row['middlename']." ".$report_history_row['lastname'];	
-									
-									mysqli_query($con,"INSERT INTO report 
-									(book_id, user_id, admin_name, detail_action, date_transaction)
-									VALUES ('$book_id','$user_id','$admin_row','Borrowed Book',NOW())") or die(mysqli_error($con));
-									
-									}
-									
-							?>
-									<script>
-										window.location="borrow_book.php?roll_number=<?php echo $roll_number ?>";
-									</script>
-							<?php	
+php
+mysqli_query($con, "UPDATE book SET remarks = ? WHERE book_id = ?", array('Not Available', $book_id)) or die(mysqli_error($con));
+
+mysqli_query($con, "INSERT INTO borrow_book(user_id, book_id, date_borrowed, due_date, borrowed_status)
+VALUES (?, ?, ?, ?, 'borrowed')", array($user_id, $book_id, $date_borrowed, $due_date)) or die(mysqli_error($con));
+
+$report_history = mysqli_query($con, "SELECT * FROM admin WHERE admin_id = ?", array($id_session)) or die(mysqli_error($con));
+$report_history_row = mysqli_fetch_array($report_history);
+$admin_row = $report_history_row['firstname'] . ' ' . $report_history_row['middlename'] . ' ' . $report_history_row['lastname'];
+
+mysqli_query($con, "INSERT INTO report 
+(book_id, user_id, admin_name, detail_action, date_transaction)
+VALUES (?, ?, ?, 'Borrowed Book', NOW())", array($book_id, $user_id, $admin_row)) or die(mysqli_error($con));
+?>
+
+<script>
+    window.location = "borrow_book.php?roll_number=<?php echo $roll_number; ?>";
+</script>
+<?php
 								}
 							?>
 							</form>
